@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow A Garden - Fruit/Pets Generator</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #111111;
+            --text-color: #ffffff;
+            --primary-color: #00ff00;
+            --secondary-color: #00cc00;
+            --accent-color: #ffffff;
+            --border-color: #333333;
+            --notification-bg: #1a1a1a;
+            --glow-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        body {
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        @font-face {
+            font-family: 'Orbitron';
+            src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+            text-shadow: 0 0 5px var(--primary-color);
+            margin-bottom: 0.5em;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-top: 0;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            text-align: center;
+            color: var(--secondary-color);
+            letter-spacing: 1px;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 0;
+        }
+        
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, #00ff00, #000000, #000000, #00ff00);
+            background-size: 400%;
+            opacity: 0;
+            transition: 0.5s;
+            border-radius: 15px;
+        }
+        
+        .container:hover::before {
+            opacity: 0.3;
+            animation: animate 8s linear infinite;
+        }
+        
+        @keyframes animate {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+        
+        .input-group {
+            margin: 30px 0;
+        }
+        
+        input[type="text"] {
+            padding: 15px;
+            width: 100%;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            font-size: 18px;
+            background-color: transparent;
+            color: var(--text-color);
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+        
+        button {
+            background-color: transparent;
+            color: white;
+            border: 2px solid var(--accent-color);
+            padding: 16px 32px;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            display: block;
+            width: 100%;
+            margin: 25px 0;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--glow-color), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover {
+            box-shadow: 0 0 20px var(--glow-color), 0 0 40px var(--glow-color);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .item-card {
+            background-color: var(--notification-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00ff00, #000000, #000000, #00ff00);
+            background-size: 400%;
+            opacity: 0;
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .item-card:hover::before {
+            opacity: 0.2;
+            animation: animate 8s linear infinite;
+        }
+        
+        .item-card.selected {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        .item-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 25px;
+            height: 25px;
+            background-color: var(--primary-color);
+            color: black;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .claimed-notification {
+            background-color: var(--notification-bg);
+            padding: 18px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .claimed-notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            transform: translateX(-100%);
+        }
+        
+        .claimed-notification:hover::before {
+            animation: shine 1.5s;
+        }
+        
+        @keyframes shine {
+            100% { transform: translateX(100%); }
+        }
+        
+        .loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+        
+        .private-server-link {
+            display: none;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .private-server-link a {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 18px 36px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 20px;
+            transition: all 0.3s;
+            border: 2px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .private-server-link a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .private-server-link a:hover {
+            box-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--primary-color);
+        }
+        
+        .private-server-link a:hover::before {
+            left: 100%;
+        }
+        
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+            margin: 30px 0;
+        }
+        
+        .checkbox-item {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-left: 35px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .checkbox-item input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        .checkbox-item:hover input ~ .checkmark {
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .checkbox-item input:checked ~ .checkmark {
+            background-color: var(--primary-color);
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        
+        .checkbox-item input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        .checkbox-item .checkmark:after {
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+        
+        .pack-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .username {
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        .item-subtext {
+            color: #888;
+            font-size: 1rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        @media (max-width: 600px) {
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+            }
+            
+            button, .private-server-link a {
+                padding: 14px 28px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GROW A GARDEN</h1>
+        <h2>Fruit/Pets Generator</h2>
+        
+        <div class="input-group">
+            <label for="username">Enter Username</label>
+            <input type="text" id="username" placeholder="Your username...">
+        </div>
+        
+        <button id="generateBtn">GENERATE</button>
+        
+        <h3>Browse through the available fruits/pets:</h3>
+        <p>New Items!: </p>
+        
+        <div class="items-grid">
+            <div class="item-card" data-item="Kitsune">
+                <h3>Kitsune</h3>
+            </div>
+            <div class="item-card" data-item="Spinosaurus">
+                <h3>Spinosaurus</h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1>Fruits:</h1>
+        
+        <div class="item-card" data-item="Bone Blossom">
+            <h2>Bone Blossom</h2>
+            <p class="item-subtext">Ancient Pack</p>
+        </div>
+        
+        <hr>
+        
+        <div class="item-card" data-item="Pitcher Plant">
+            <h2>Pitcher Plant</h2>
+            <p class="item-subtext">Candy Blossom</p>
+        </div>
+        
+        <hr>
+        
+        <div class="item-card" data-item="Elephant Ears">
+            <h2>Elephant Ears</h2>
+            <p class="item-subtext">Dragon Pepper</p>
+        </div>
+        
+        <hr>
+        
+        <div class="claimed-notification">
+            <p><span class="username">Moon Me</span></p>
+            <p><span class="username">radicalhooligan</span></p>
+            <p>Just Claimed Elephant Ears!</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1>Maple Apple</h1>
+        
+        <div class="item-card" data-item="Zen Egg">
+            <h3>Zen Egg</h3>
+            <p class="item-subtext">Primal Egg</p>
+        </div>
+        
+        <div class="checkbox-item">
+            <input type="checkbox" id="pet1">
+            <label for="pet1" class="checkmark-label">Pets:</label>
+            <span class="checkmark"></span>
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox" id="pet2">
+            <label for="pet2" class="checkmark-label">T-Rex Dinosaur</label>
+            <span class="checkmark"></span>
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox" id="pet3">
+            <label for="pet3" class="checkmark-label">Disco Bee</label>
+            <span class="checkmark"></span>
+        </div>
+        
+        <hr>
+        
+        <div class="claimed-notification">
+            <p><span class="username">bouwithdream</span></p>
+            <p>Just Redeemed an Octopus Pet!</p>
+        </div>
+        
+        <p>Racoon P_</p>
+    </div>
+    
+    <div class="container">
+        <div class="pack-title">Summer Seed Pack</div>
+        
+        <div class="items-grid">
+            <div class="item-card" data-item="Sugar Apple">
+                <h3>Sugar Apple</h3>
+            </div>
+            <div class="item-card" data-item="Ember Lily">
+                <h3>Ember Lily</h3>
+                <p class="item-subtext">Beanstalk</p>
+            </div>
+            <div class="item-card" data-item="Feijoa">
+                <h3>Feijoa</h3>
+            </div>
+            <div class="item-card" data-item="Loquat">
+                <h3>Loquat</h3>
+            </div>
+            <div class="item-card" data-item="Prickly Pear">
+                <h3>Prickly Pear</h3>
+            </div>
+            <div class="item-card" data-item="Bell Pepper">
+                <h3>Bell Pepper</h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        <h2 id="loadingText">INITIALIZING GENERATION SEQUENCE</h2>
+        <div class="private-server-link" id="privateServerLink">
+            <p>YOUR ITEM IS READY!</p>
+            <a href="https://www.roblox.com/games/" target="_blank">JOIN PRIVATE SERVER</a>
+        </div>
+    </div>
+    
+    <script>
+        // Item selection functionality
+        const itemCards = document.querySelectorAll('.item-card');
+        let selectedItem = null;
+        
+        itemCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                itemCards.forEach(c => c.classList.remove('selected'));
+                
+                // Select this card
+                this.classList.add('selected');
+                selectedItem = this.getAttribute('data-item');
+                
+                // Update generate button text
+                document.getElementById('generateBtn').textContent = `GENERATE ${selectedItem.toUpperCase()}`;
+            });
+        });
+        
+        // Generate button functionality
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert('Please enter a username first!');
+                return;
+            }
+            
+            if (!selectedItem) {
+                alert('Please select an item first!');
+                return;
+            }
+            
+            // Show loading screen
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.style.display = 'flex';
+            
+            // Disable button during processing
+            this.disabled = true;
+            
+            // Loading sequence
+            const loadingStages = [
+                { time: 2000, text: "ACCESSING GARDEN DATABASE" },
+                { time: 4000, text: "GENERATING UNIQUE ITEM CODE" },
+                { time: 6000, text: "CONNECTING TO SERVER" },
+                { time: 8000, text: "FINALIZING GENERATION" }
+            ];
+            
+            loadingStages.forEach(stage => {
+                setTimeout(() => {
+                    document.getElementById('loadingText').textContent = stage.text;
+                }, stage.time);
+            });
+            
+            // After 10 seconds, show the private server link
+            setTimeout(function() {
+                document.getElementById('privateServerLink').style.display = 'block';
+                document.getElementById('loadingText').textContent = "GENERATION COMPLETE";
+                
+                // Add a claimed notification to the page
+                const newNotification = document.createElement('div');
+                newNotification.className = 'claimed-notification';
+                newNotification.innerHTML = `
+                    <p><span class="username">${username}</span></p>
+                    <p>Just Claimed a ${selectedItem}!</p>
+                `;
+                
+                // Add it to the first container
+                document.querySelector('.container').appendChild(newNotification);
+                
+                // Re-enable button
+                document.getElementById('generateBtn').disabled = false;
+            }, 10000);
+        });
+    </script>
+</body>
+</html>
